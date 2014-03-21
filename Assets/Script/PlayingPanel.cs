@@ -20,11 +20,11 @@ public class PlayingPanel : MonoBehaviour
     private void AddOneRandomUnit()
     {
         int[] indexArray = PlayingUnitManager.GetInstance().GetEmptyUnits().ToArray();
-        if (indexArray.Length >= 2)
+        if (indexArray.Length >= 1)
         {
             PlayingUnitManager.GetInstance()
-            .AddPlayingUnit(indexArray[Random.Range(0, indexArray.Length)], CardType.Farmer);
-            indexArray = PlayingUnitManager.GetInstance().GetEmptyUnits().ToArray();
+                .AddPlayingUnit(indexArray[Random.Range(0, indexArray.Length)], Random.Range(0,2) == 0?CardType.WuLong0:CardType.PuEr0);
+            /*indexArray = PlayingUnitManager.GetInstance().GetEmptyUnits().ToArray();
             int randomIndex = Random.Range(0, 100);
             if (randomIndex < 20)
             {
@@ -33,7 +33,7 @@ public class PlayingPanel : MonoBehaviour
             else if (randomIndex >= 20 && randomIndex < 70)
             {
                 PlayingUnitManager.GetInstance().AddPlayingUnit(indexArray[Random.Range(0, indexArray.Length)], CardType.Book);
-            }
+            }*/
         }
         //PlayingUnitManager.GetInstance()
             //.AddPlayingUnit(indexArray[Random.Range(0, indexArray.Length)], Random.Range(0, 100) < 70 ? 2 : 4);
@@ -70,7 +70,7 @@ public class PlayingPanel : MonoBehaviour
     private void Init()
     {
         int randomIndex1 = Random.Range(0, MyTool.RowCount * MyTool.ColumnCount);
-        PlayingUnitManager.GetInstance().AddPlayingUnit(randomIndex1, CardType.Farmer);
+        PlayingUnitManager.GetInstance().AddPlayingUnit(randomIndex1, Random.Range(0,2) == 0?CardType.WuLong0:CardType.PuEr0);
         int randomIndex2;
         while (true)
         {
@@ -80,7 +80,7 @@ public class PlayingPanel : MonoBehaviour
                 break;
             }
         }
-        PlayingUnitManager.GetInstance().AddPlayingUnit(randomIndex2, CardType.Book);
+        PlayingUnitManager.GetInstance().AddPlayingUnit(randomIndex2, Random.Range(0, 2) == 0?CardType.WuLong0:CardType.PuEr0);
 
 
         //PlayingUnitManager.GetInstance().AddPlayingUnit(4, 2);

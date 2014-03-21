@@ -1,28 +1,31 @@
 ﻿// ReSharper disable once CheckNamespace
 // ReSharper disable once InconsistentNaming
+
 public enum CardType
 {
-    AntiKing, //反王
+    WuLong0,
 
-    Bandit, //山贼
+    PuEr0,
 
-    Book, //书籍
+    BuMa1,
 
-    Farmer, //农民
+    GuiXianRen4,
 
-    General, //将军
+    JiaLinXianRen5,
 
-    Marshal, //元帅
+    KeLin8,
 
-    MilitaryAdviser, //军师
+    LanQi3,
 
-    RebelArmy, //叛军
+    QiQi2,
 
-    Scholar, //秀才
+    TianJinFan9,
 
-    Soldier, //士兵
+    TianShen10,
 
-    StaffOfficer, //参谋
+    WuKong11,
 
-    Weapon //武器
+    YaMuCha6,
+
+    YaQiLuoBei7
 }

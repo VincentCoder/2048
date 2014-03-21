@@ -38,7 +38,7 @@ public class PlayingUnit : MonoBehaviour
     {
         if (this.SelfSprite != null)
         {
-            this.SelfSprite.spriteName = "Box_" + this.CardType;
+            this.SelfSprite.spriteName = "" + this.CardType;
         }
     }
 

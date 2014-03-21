@@ -50,7 +50,7 @@ public class PlayingUnitManager
     }
 
     public void AddPlayingUnit(int unitId, CardType cardType)
-    { 
+    {
         GameObject playingUnitObj = (GameObject)Object.Instantiate(Resources.Load("PlayingUnit"));
         int rowId = 0;
         int columnId = MyTool.CalculateRowAndColumnByUnitId(unitId, out rowId);
@@ -69,6 +69,22 @@ public class PlayingUnitManager
         this.playingUnitArray[columnId, rowId] = playingUnit;
     }
 
+    public List<int> GetEmptyUnits()
+    {
+        List<int> emptyIndexes = new List<int>();
+        for (int i = 0; i < MyTool.RowCount; i ++)
+        {
+            for (int j = 0; j < MyTool.ColumnCount; j ++)
+            {
+                if (this.playingUnitArray[j, i] == null)
+                {
+                    emptyIndexes.Add(MyTool.CalculateUnitIdByRowAndColumn(i, j));
+                }
+            }
+        }
+        return emptyIndexes;
+    }
+
     public PlayingUnit GetPlayingUnitById(int unitId)
     {
         return this.playingUnitDic.ContainsKey(unitId) ? this.playingUnitDic[unitId] : null;
@@ -83,7 +99,7 @@ public class PlayingUnitManager
         return this.playingUnitArray[columnId, rowId];
     }
 
-    public void MoveAndMerge(FingerGestures.SwipeDirection direction)
+    /*public void MoveAndMerge(FingerGestures.SwipeDirection direction)
     {
         switch (direction)
         {
@@ -328,9 +344,213 @@ public class PlayingUnitManager
                 }
                 break;
         }
+    }*/
+
+    public void MoveAndMerge(FingerGestures.SwipeDirection direction)
+    {
+        switch (direction)
+        {
+            case FingerGestures.SwipeDirection.Up:
+                {
+                    for (int i = 0; i < MyTool.ColumnCount; i++)
+                    {
+                        // Move
+                        for (int j = 1; j < MyTool.RowCount; j++)
+                        {
+                            PlayingUnit currentMoveUnit = this.playingUnitArray[i, j];
+                            if (currentMoveUnit != null)
+                            {
+                                if (this.playingUnitArray[i, j - 1] == null)
+                                {
+                                    this.playingUnitArray[currentMoveUnit.ColumnIndex, currentMoveUnit.RowIndex] = null;
+                                    currentMoveUnit.MoveTo(j - 1, i);
+                                    this.playingUnitArray[i, j - 1] = currentMoveUnit;
+                                }
+                                else if (this.playingUnitArray[i, j - 1].CardType == currentMoveUnit.CardType)
+                                {
+                                    this.PlayingUnitMerge(i, j, i, j-1);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case FingerGestures.SwipeDirection.Down:
+                {
+                    for (int i = 0; i < MyTool.ColumnCount; i++)
+                    {
+                        // Move
+                        for (int j = MyTool.RowCount - 2; j >= 0; j--)
+                        {
+                            PlayingUnit currentMoveUnit = this.playingUnitArray[i, j];
+                            if (currentMoveUnit != null)
+                            {
+                                if (this.playingUnitArray[i, j + 1] == null)
+                                {
+                                    this.playingUnitArray[currentMoveUnit.ColumnIndex, currentMoveUnit.RowIndex] = null;
+                                    currentMoveUnit.MoveTo(j + 1, i);
+                                    this.playingUnitArray[i, j + 1] = currentMoveUnit;
+                                }
+                                else if (this.playingUnitArray[i, j + 1].CardType == currentMoveUnit.CardType)
+                                {
+                                    this.PlayingUnitMerge(i, j, i, j+1);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case FingerGestures.SwipeDirection.Left:
+                {
+                    for (int i = 0; i < MyTool.RowCount; i++)
+                    {
+                        // Move
+                        for (int j = 1; j < MyTool.ColumnCount; j++)
+                        {
+                            PlayingUnit currentMoveUnit = this.playingUnitArray[j, i];
+                            if (currentMoveUnit != null)
+                            {
+                                if (this.playingUnitArray[j-1, i] == null)
+                                {
+                                    this.playingUnitArray[currentMoveUnit.ColumnIndex, currentMoveUnit.RowIndex] = null;
+                                    currentMoveUnit.MoveTo(i, j-1);
+                                    this.playingUnitArray[j - 1, i] = currentMoveUnit;
+                                }
+                                else if (this.playingUnitArray[j - 1, i].CardType == currentMoveUnit.CardType)
+                                {
+                                    this.PlayingUnitMerge(j, i, j-1, i);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case FingerGestures.SwipeDirection.Right:
+                {
+                    for (int i = 0; i < MyTool.RowCount; i++)
+                    {
+                        // Move
+                        for (int j = MyTool.ColumnCount - 2; j >= 0; j--)
+                        {
+                            PlayingUnit currentMoveUnit = this.playingUnitArray[j, i];
+                            if (currentMoveUnit != null)
+                            {
+                                if (this.playingUnitArray[j+1, i] == null)
+                                {
+                                    this.playingUnitArray[currentMoveUnit.ColumnIndex, currentMoveUnit.RowIndex] = null;
+                                    currentMoveUnit.MoveTo(i, j+1);
+                                    this.playingUnitArray[j + 1, i] = currentMoveUnit;
+                                }
+                                else if (this.playingUnitArray[j + 1, i].CardType == currentMoveUnit.CardType)
+                                {
+                                    this.PlayingUnitMerge(j, i, j+1, i);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+        }
     }
 
     public void PlayingUnitMerge(int attackRow, int attackColumn, int defenseRow, int defenseColumn)
+    {
+        PlayingUnit unitAttack = this.playingUnitArray[attackRow, attackColumn];
+        PlayingUnit unitDefense = this.playingUnitArray[defenseRow, defenseColumn];
+        if (unitAttack.CardType != unitDefense.CardType)
+        {
+            return;
+        }
+        switch (unitAttack.CardType)
+        {
+            case CardType.WuLong0:
+                {
+                    unitDefense.CardType = CardType.BuMa1;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.PuEr0:
+                {
+                    unitDefense.CardType = CardType.BuMa1;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.BuMa1:
+                {
+                    unitDefense.CardType = CardType.QiQi2;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.QiQi2:
+                {
+                    unitDefense.CardType = CardType.LanQi3;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.LanQi3:
+                {
+                    unitDefense.CardType = CardType.GuiXianRen4;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.GuiXianRen4:
+                {
+                    unitDefense.CardType = CardType.JiaLinXianRen5;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.JiaLinXianRen5:
+                {
+                    unitDefense.CardType = CardType.YaMuCha6;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.YaMuCha6:
+                {
+                    unitDefense.CardType = CardType.YaQiLuoBei7;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.YaQiLuoBei7:
+                {
+                    unitDefense.CardType = CardType.KeLin8;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.KeLin8:
+                {
+                    unitDefense.CardType = CardType.TianJinFan9;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.TianJinFan9:
+                {
+                    unitDefense.CardType = CardType.TianShen10;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+            case CardType.TianShen10:
+                {
+                    unitDefense.CardType = CardType.WuKong11;
+                    unitAttack.DestroySelf();
+                    this.playingUnitArray[attackRow, attackColumn] = null;
+                }
+                break;
+        }
+    }
+
+    /*public void PlayingUnitMerge(int attackRow, int attackColumn, int defenseRow, int defenseColumn)
     {
         PlayingUnit unitAttack = this.playingUnitArray[attackRow, attackColumn];
         PlayingUnit unitDefense = this.playingUnitArray[defenseRow, defenseColumn];
@@ -550,7 +770,7 @@ public class PlayingUnitManager
                 }
                 break;
         }
-    }
+    }*/
 
     public void RemoveAllPlayingUnits()
     {
@@ -573,22 +793,6 @@ public class PlayingUnitManager
             this.playingUnitArray[columnId, rowId] = null;
         }
         return true;
-    }
-
-    public List<int> GetEmptyUnits ()
-    {
-        List<int> emptyIndexes = new List<int>();
-        for (int i = 0; i < MyTool.RowCount; i ++)
-        {
-            for (int j = 0; j < MyTool.ColumnCount; j ++)
-            {
-                if (this.playingUnitArray[j, i] == null)
-                {
-                    emptyIndexes.Add(MyTool.CalculateUnitIdByRowAndColumn(i,j));
-                }
-            }
-        }
-        return emptyIndexes;
     }
 
     #endregion

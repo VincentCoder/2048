@@ -3,15 +3,15 @@ using System.Collections;
 
 public class MyTool
 {
-    public static int RowCount = 5;
+    public static int RowCount = 4;
 
-    public static int ColumnCount = 5;
+    public static int ColumnCount = 4;
 
-    public static int PanelWidth = 640;
+    public static int PanelWidth = 612;
 
     public static int UnitWidth = 128;
 
-    public static int UnitGap = 0;
+    public static int UnitGap = 20;
 
     public static int CalculateUnitIdByRowAndColumn(int rowId, int columnId)
     {
